@@ -5,7 +5,6 @@ const savedNotes = require('./db/db.json');
 const PORT = process.env.PORT || 3002;
 const { v4: uuidv4 } = require('uuid');
 
-console.log(savedNotes)
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -53,6 +52,19 @@ app.post('/api/notes', (req, res) => {
         }
     })
 });
+
+app.delete('/api/notes/:id', (req,res) => {
+    console.log(req.params.id);
+const newNotes = savedNotes.filter(function(note){
+    return note.id != req.params.id
+})
+console.log(newNotes)
+fs.writeFileSync('./db/db.json', JSON.stringify(newNotes), (err, data) => {
+    if (err) {
+        console.error(err);
+    }
+})
+})
 
 
 app.listen(PORT, () => {
