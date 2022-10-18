@@ -3,7 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const savedNotes = require('./db/db.json');
 const PORT = process.env.PORT || 3002;
+const { v4: uuidv4 } = require('uuid');
 
+console.log(savedNotes)
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -20,32 +22,39 @@ app.get('/notes', (req, res) => {
 });
 
 app.get('/api/notes', (req, res) => {
-    res.status(200).json(savedNotes);
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            var notes = JSON.parse(data)
+            res.json(notes)
+        }
+    })
 });
 
-app.post('/api/notes', (req,res)=> {
+app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request received to save notes`);
     console.log(req.body);
 
-const newNote = req.body;
 
- fs.readFile('./db/db.json', 'utf8', (err, data) => {
-    if (err) {
-        console.error(err);
-    } else {
-        let parseDb = JSON.parse(data);
-        parseDb.push(newNote) 
-        fs.appendFile('./db/db.json', JSON.stringify(parseDb), (err, data) => {
+    const newNote = req.body;
+    newNote.id = uuidv4()
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
         if (err) {
-        console.error(err);
+            console.error(err);
+        } else {
+            let parseDb = JSON.parse(data);
+            parseDb.push(newNote)
+            fs.writeFileSync('./db/db.json', JSON.stringify(parseDb), (err, data) => {
+                if (err) {
+                    console.error(err);
+                }
+            })
         }
     })
-    }
-})
 });
 
 
 app.listen(PORT, () => {
     console.log(`check if the link works at http://localhost:${PORT}`);
 });
-
