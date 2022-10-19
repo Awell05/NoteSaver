@@ -33,7 +33,7 @@ app.get('/api/notes', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request received to save notes`);
-    console.log(req.body);
+   
 
 
     const newNote = req.body;
@@ -54,7 +54,6 @@ app.post('/api/notes', (req, res) => {
 });
 
 app.delete('/api/notes/:id', (req,res) => {
-    console.log(req.params.id);
 const newNotes = savedNotes.filter(function(note){
     return note.id != req.params.id
 })
